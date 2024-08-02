@@ -15,6 +15,7 @@ use App\Http\Controllers\LoginController;
 |
 */
 Route::post('/register', [RegisterController::class, 'registre']);
+// Route::get('/user/{id}', [RegisterController::class, 'show']);
 Route::post('/login', [LoginController::class, 'login']);
 
 

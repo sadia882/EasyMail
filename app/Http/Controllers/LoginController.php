@@ -15,7 +15,7 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request)
     {
-        if (auth()->attempt($request->only(['email', 'password']))) {
+        if (auth()->attempt($request->only(['telephone', 'password']))) {
             $user = auth()->user();
             $token = $user->createToken("MA_CLE_SECRETE_VISIBLE_UNIQUEMENT_AU_BACKEND")->plainTextToken;
 

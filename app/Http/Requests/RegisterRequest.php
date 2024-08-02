@@ -22,11 +22,10 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom' => 'required',
-            'prenom' => 'required',
-            'telephone' => 'required|unique:users,telephone',
-            'email' => 'required|unique:users,email',
-            'password' => 'required',
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'telephone' => 'required|string|max:20|unique:users,telephone',
+            'password' => 'required|string|min:8',
         ];
     }
 
@@ -40,8 +39,7 @@ class RegisterRequest extends FormRequest
             'prenom.required' => 'Un prénom doit être fourni.',
             'telephone.required' => 'Un numéro de téléphone doit être fourni.',
             'telephone.unique' => 'Le numéro de téléphone est déjà utilisé.',
-            'email.required' => 'Une adresse email doit être fournie.',
-            'email.unique' => 'L\'adresse email est déjà utilisée.',
+            'password.required' => 'Un mot de passe doit être fourni.',
         ];
     }
 }
