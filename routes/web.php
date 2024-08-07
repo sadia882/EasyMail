@@ -10,6 +10,5 @@ Route::get('/', function () {
 
 
 
-Route::get('/send-mail', [EmailController::class, 'sendEmail']);
-Route::get('/emails', [EmailController::class, 'getEmails']);
-Route::get('/emails/{id}', [EmailController::class, 'deleteEmail']);
+Route::post('/send-email', [EmailController::class, 'sendEmail']);
+
