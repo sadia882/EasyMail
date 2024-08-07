@@ -26,7 +26,7 @@ class ForgotPasswordController extends Controller
         );
         // Vérification du statut et retour de la réponse appropriée
         if ($status === Password::RESET_LINK_SENT) {
-            return response()->json(['message' => 'Un lien de réinitialisation de mot de passe a été envoyé à votre adresse e-mail.'], 200);
+            return response()->json(['message' => 'Un lien de reinitialisation de mot de passe a ete envoye a votre adresse e-mail.'], 200);
         }
 
         if ($status === Password::INVALID_USER) {

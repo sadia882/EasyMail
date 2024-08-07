@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+// namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Http\Request;
+// use App\Http\Controllers\Controller;
+// use Illuminate\Support\Facades\Password;
+// use Illuminate\Support\Facades\Hash;
+// use Illuminate\Support\Facades\Validator;
 
 // class ResetPasswordController extends Controller
 // {
@@ -44,40 +44,95 @@ use Illuminate\Support\Facades\Validator;
 //     }
 // }
 
+// class ResetPasswordController extends Controller
+// {
+//     public function showResetForm($token)
+//     {
+//         return view('auth.passwords.reset', ['token' => $token]);
+//     }
+
+//     public function reset(Request $request)
+//     {
+//         try {
+//             $request->validate([
+//                 'token' => 'required',
+//                 'email' => 'required|email',
+//                 'password' => 'required|min:8|confirmed',
+//             ]);
+    
+//             $status = Password::reset(
+//                 $request->only('email', 'password', 'password_confirmation', 'token'),
+//                 function ($user, $password) {
+//                     $user->forceFill([
+//                         'password' => Hash::make($password),
+//                         'remember_token' => Str::random(60),
+//                     ])->save();
+//                 }
+//             );
+    
+//             if ($status == Password::PASSWORD_RESET) {
+//                 return response()->json(['message' => 'Mot de passe réinitialisé avec succès.'], 200);
+//             }
+    
+//             return response()->json(['message' => $status . 'Erreur lors de la réinitialisation du mot de passe.'], 500);
+//         } catch (\Throwable $th) {
+//             return response()->json(['message' => $th->getMessage()], 500);
+//         }
+        
+//     }
+// }
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
 class ResetPasswordController extends Controller
 {
-    public function showResetForm($token)
-    {
-        return view('auth.passwords.reset', ['token' => $token]);
-    }
-
     public function reset(Request $request)
     {
-        try {
-            $request->validate([
-                'token' => 'required',
-                'email' => 'required|email',
-                'password' => 'required|min:8|confirmed',
-            ]);
-    
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function ($user, $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password),
-                        'remember_token' => Str::random(60),
-                    ])->save();
-                }
-            );
-    
-            if ($status == Password::PASSWORD_RESET) {
-                return response()->json(['message' => 'Mot de passe réinitialisé avec succès.'], 200);
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'token.required' => 'Le token de réinitialisation est requis.',
+            'email.required' => 'L\'adresse e-mail est requise.',
+            'email.email' => 'L\'adresse e-mail doit être valide.',
+            'password.required' => 'Le mot de passe est requis.',
+            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'password.confirmed' => 'Les mots de passe ne correspondent pas.',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                ])->save();
             }
-    
-            return response()->json(['message' => $status . 'Erreur lors de la réinitialisation du mot de passe.'], 500);
-        } catch (\Throwable $th) {
-            return response()->json(['message' => $th->getMessage()], 500);
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Mot de passe réinitialisé avec succès.'], 200);
         }
-        
+
+        return response()->json(['message' => $this->getErrorMessage($status)], 500);
+    }
+
+    private function getErrorMessage($status)
+    {
+        switch ($status) {
+            case Password::INVALID_TOKEN:
+                return 'Token de réinitialisation invalide.';
+            case Password::INVALID_USER:
+                return 'Adresse e-mail non trouvée.';
+            default:
+                return 'Erreur inconnue lors de la réinitialisation du mot de passe.';
+        }
     }
 }
