@@ -62,6 +62,10 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -110,3 +114,13 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 
 // Route pour soumettre la demande de réinitialisation de mot de passe
 Route::post('update/password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+// Création d'Utilisateurs
+Route::post('/admin/users', [UsersController::class, 'store'])->middleware('auth:api');
+
+//Suppression d'Utilisateurs
+Route::delete('/admin/users/{id}', [UsersController::class, 'destroy'])->middleware('auth:api');
+//assigner un rôle à un utilisateur:
+Route::post('/admin/roles', [RoleController::class, 'assignRole'])->middleware('auth:api');
+
+Route::post('/admin/permissions', [PermissionController::class, 'assignPermission'])->middleware('auth:api');
