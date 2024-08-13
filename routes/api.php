@@ -122,5 +122,5 @@ Route::post('/admin/users', [UsersController::class, 'store'])->middleware('auth
 Route::delete('/admin/users/{id}', [UsersController::class, 'destroy'])->middleware('auth:api');
 //assigner un rôle à un utilisateur:
 Route::post('/admin/roles', [RoleController::class, 'assignRole'])->middleware('auth:api');
-
+//assigner une permission à un utilisateur:
 Route::post('/admin/permissions', [PermissionController::class, 'assignPermission'])->middleware('auth:api');
