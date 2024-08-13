@@ -56,6 +56,7 @@
 
 ///...........................................................................
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
@@ -110,3 +111,9 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 
 // Route pour soumettre la demande de réinitialisation de mot de passe
 Route::post('update/password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+//Routes de Gestion des Utilisateurs
+// Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+//     Route::post('/users', [AdminController::class, 'store']);
+//     Route::delete('/users/{id}', [AdminController::class, 'destroy']);
+// });
