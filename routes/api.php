@@ -8,9 +8,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\PasswordResetController;
-use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -65,3 +64,14 @@ Route::post('/admin/permissions', [PermissionController::class, 'assignPermissio
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+//
+// Route pour envoyer le lien de réinitialisation de mot de passe
+Route::post('password/forgot', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// Route pour afficher le formulaire de réinitialisation de mot de passe
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+
+// Route pour soumettre la demande de réinitialisation de mot de passe
+Route::post('update/password', [ResetPasswordController::class, 'reset'])->name('password.update');
