@@ -9,7 +9,6 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
-use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
