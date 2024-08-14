@@ -14,7 +14,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    use HasRoles;
+    // use HasRoles;
     
 
     /**

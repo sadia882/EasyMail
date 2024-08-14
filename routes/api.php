@@ -115,12 +115,22 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 // Route pour soumettre la demande de réinitialisation de mot de passe
 Route::post('update/password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
-// Création d'Utilisateurs
-Route::post('/admin/users', [UsersController::class, 'store'])->middleware('auth:api');
+// // Création d'Utilisateurs
+// Route::post('/admin/users', [UsersController::class, 'store'])->middleware('auth:api');
 
-//Suppression d'Utilisateurs
-Route::delete('/admin/users/{id}', [UsersController::class, 'destroy'])->middleware('auth:api');
-//assigner un rôle à un utilisateur:
-Route::post('/admin/roles', [RoleController::class, 'assignRole'])->middleware('auth:api');
-//assigner une permission à un utilisateur:
-Route::post('/admin/permissions', [PermissionController::class, 'assignPermission'])->middleware('auth:api');
+// //Suppression d'Utilisateurs
+// Route::delete('/admin/users/{id}', [UsersController::class, 'destroy'])->middleware('auth:api');
+// //assigner un rôle à un utilisateur:
+// Route::post('/admin/roles', [RoleController::class, 'assignRole'])->middleware('auth:api');
+// //assigner une permission à un utilisateur:
+// Route::post('/admin/permissions', [PermissionController::class, 'assignPermission'])->middleware('auth:api');
+
+// Création d'un utilisateur :
+Route::middleware('auth:sanctum')->group(function () { 
+
+Route::post('/users', [UsersController::class, 'store']);
+
+//route pour la suppression de l'utilisateur.
+Route::delete('/users/{id}', [UsersController::class, 'destroy']);
+
+});
