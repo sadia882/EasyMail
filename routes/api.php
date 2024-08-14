@@ -63,6 +63,11 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -128,9 +133,3 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 
 // Route pour soumettre la demande de réinitialisation de mot de passe
 Route::post('update/password', [ResetPasswordController::class, 'reset'])->name('password.update');
-
-//Routes de Gestion des Utilisateurs
-// Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-//     Route::post('/users', [AdminController::class, 'store']);
-//     Route::delete('/users/{id}', [AdminController::class, 'destroy']);
-// });

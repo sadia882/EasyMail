@@ -11,10 +11,15 @@ use App\Notifications\ResetPasswordNotification;
 
 use Spatie\Permission\Traits\HasRoles;
 
+use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
     use HasRoles;
+
+    use HasRoles;
+    
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +31,7 @@ class User extends Authenticatable
         'nom',
         'telephone',
         'email',
+        'role',
         'password',
     ];
 

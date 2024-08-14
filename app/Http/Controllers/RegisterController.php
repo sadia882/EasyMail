@@ -26,6 +26,7 @@ class RegisterController extends Controller
                 'prenom' => $request->prenom,
                 'telephone' => $request->telephone,
                 'email' => $request->email,
+                'role' => 'client',
                 'password' => Hash::make($request->password),
             ]);
 
@@ -41,8 +42,6 @@ class RegisterController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error in RegisterController@registre: ' . $e->getMessage());
-
             return response()->json([
                 'status' => 500,
                 'message' => 'Une erreur s\'est produite lors de l\'enregistrement de l\'utilisateur.',
