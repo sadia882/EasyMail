@@ -66,6 +66,14 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+// routes/web.php
+
+use App\Http\Controllers\EmailController;
+
+Route::get('/email', [EmailController::class, 'create']);
+Route::post('/email', [EmailController::class, 'send']);
+Route::get('/emails', [EmailController::class, 'index'])->name('emails.index'); // Route pour afficher tous les emails
+Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('emails.destroy'); // Route pour supprimer un email
 
 
 /*
