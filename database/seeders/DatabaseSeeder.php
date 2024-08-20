@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         //Ajout de rôles et permissions
-        $role = Role::create(['name' => 'admin']);
+        $role = Role::create(['name' => 'admin2']);
         $permission = Permission::create(['name' => 'manage users']);
 
         $role->givePermissionTo($permission);
