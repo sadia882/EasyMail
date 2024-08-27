@@ -69,11 +69,32 @@ use App\Http\Controllers\PermissionController;
 // routes/web.php
 
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\EmailesController;
+use App\Http\Controllers\ContactController;
+
 
 Route::get('/email', [EmailController::class, 'create']);
 Route::post('/email', [EmailController::class, 'send']);
 Route::get('/emails', [EmailController::class, 'index'])->name('emails.index'); // Route pour afficher tous les emails
 Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('emails.destroy'); // Route pour supprimer un email
+
+
+Route::post('/send-email', [EmailesController::class, 'sendEmail']);
+Route::get('/test-files', [EmailesController::class, 'testFiles']);
+// Exemple pour une route API
+Route::get('/emails', [EmailesController::class, 'getSentEmails']);
+
+
+
+
+
+// Assurez-vous que l'utilisateur est authentifié avant d'accéder aux routes
+    Route::get('contacts', [ContactController::class, 'index']);
+    Route::post('contacts', [ContactController::class, 'store']);
+    Route::get('contacts/{id}', [ContactController::class, 'show']);
+    Route::put('contacts/{id}', [ContactController::class, 'update']);
+    Route::patch('contacts/{id}', [ContactController::class, 'update']); // Vous pouvez choisir d'utiliser PUT ou PATCH selon votre besoin
+    Route::delete('contacts/{id}', [ContactController::class, 'destroy']);
 
 
 /*

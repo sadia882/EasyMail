@@ -11,7 +11,7 @@ use App\Notifications\ResetPasswordNotification;
 
 use Spatie\Permission\Traits\HasRoles;
 
-use Spatie\Permission\Traits\HasRoles;
+// use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -59,6 +59,9 @@ class User extends Authenticatable
 {
     $this->notify(new ResetPasswordNotification($token));
 }
-
+public function contacts()
+{
+    return $this->hasMany(Contact::class);
+}
     
 }
