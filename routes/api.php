@@ -80,21 +80,27 @@ Route::delete('/email/{id}', [EmailController::class, 'destroy'])->name('emails.
 
 
 Route::post('/send-email', [EmailesController::class, 'sendEmail']);
-Route::get('/test-files', [EmailesController::class, 'testFiles']);
-// Exemple pour une route API
 Route::get('/emails', [EmailesController::class, 'getSentEmails']);
+Route::get('/test-files', [EmailesController::class, 'testFiles']);
 
 
 
 
 
 // Assurez-vous que l'utilisateur est authentifié avant d'accéder aux routes
-    Route::get('contacts', [ContactController::class, 'index']);
-    Route::post('contacts', [ContactController::class, 'store']);
-    Route::get('contacts/{id}', [ContactController::class, 'show']);
-    Route::put('contacts/{id}', [ContactController::class, 'update']);
-    Route::patch('contacts/{id}', [ContactController::class, 'update']); // Vous pouvez choisir d'utiliser PUT ou PATCH selon votre besoin
-    Route::delete('contacts/{id}', [ContactController::class, 'destroy']);
+
+
+// Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/contacts', [ContactController::class, 'index']);
+    Route::post('/contacts', [ContactController::class, 'store']);
+    Route::get('/contacts/{id}', [ContactController::class, 'show']);
+    Route::put('/contacts/{id}', [ContactController::class, 'update']);
+    Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
+    Route::post('/contacts/{id}/send-email', [ContactController::class, 'sendEmail']);
+    Route::get('/onecontact/{userId}', [ContactController::class, 'getContactsByUser']);
+
+    
+// });
 
 
 /*

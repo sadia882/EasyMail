@@ -2,64 +2,179 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
-use Illuminate\Http\Request;
-use App\Http\Controllers\LoginController;
+use Illuminate\Support\Facades\Mail;
 
+use App\Mail\ContactEmail; 
+use Illuminate\Http\Request;
+use App\Models\Contact;
+use App\Models\User;
+
+use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json(['message' => 'Utilisateur non authentifié.'], 401);
-        }
-        $contacts = $user->contacts; // Récupère les contacts de l'utilisateur connecté
-        return response()->json($contacts);
-    }
+        // Récupérer tous les contacts
+        $contacts = Contact::all();
     
+        return response()->json([
+            'status' => 200,
+            'message' => 'Contacts récupérés avec succès !',
+            'results' => $contacts,
+        ]);
+    }
+    public function getContactsByUser($userId)
+{
+    // Vérifier si l'utilisateur existe
+    $user = User::find($userId);
+
+    if (!$user) {
+        return response()->json([
+            'status' => 404,
+            'message' => 'Utilisateur non trouvé.',
+        ], 404);
+    }
+
+    // Récupérer un contact spécofique à l'id
+    $contacts = $user->contacts;
+
+    return response()->json([
+        'status' => 200,
+        'message' => 'Contacts récupérés avec succès !',
+        'results' => $contacts,
+    ]);
+}
+// Création de contact à partir de l'id du user dans la table users
+
     public function store(Request $request)
     {
-        $request->validate([
-            'nom' => 'required|string',
-            'prenom' => 'required|string',
-            'email' => 'required|email|unique:contacts,email',
-            'telephone' => 'nullable|string',
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'telephone' => 'required|string|max:15',
+            'email' => 'required|string|email|max:255|unique:contacts',
+            'user_id' => 'required|integer',  
         ]);
-
-        $contact = auth()->user()->contacts()->create($request->all());
-
-        return response()->json($contact, 201);
+    
+        $userId = $request->user_id;
+    
+        $contact = Contact::create([
+            'user_id' => $userId,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'telephone' => $request->telephone,
+            'email' => $request->email,
+        ]);
+    
+        \Log::info('Contact created:', ['contact' => $contact]);
+    
+        return response()->json([
+            'status' => 201,
+            'message' => 'Contact créé avec succès !',
+            'results' => $contact,
+        ]);
     }
-
-    public function show($id)
-    {
-        $contact = auth()->user()->contacts()->findOrFail($id);
-        return response()->json($contact);
-    }
+        
 
     public function update(Request $request, $id)
     {
-        $contact = auth()->user()->contacts()->findOrFail($id);
-
-        $request->validate([
-            'nom' => 'sometimes|required|string',
-            'prenom' => 'sometimes|required|string',
-            'email' => 'sometimes|required|email|unique:contacts,email,' . $contact->id,
-            'telephone' => 'nullable|string',
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'telephone' => 'required|string|max:15',
+            'email' => 'required|string|email|max:255|unique:contacts,email,' . $id,
+            'user_id' => 'required|integer',
         ]);
-
-        $contact->update($request->all());
-
-        return response()->json($contact);
+    
+        // Trouver le contact par ID
+        $contact = Contact::find($id);
+    
+        if (!$contact) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Contact non trouvé.',
+            ], 404);
+        }
+    
+        // Mettre à jour les informations du contact
+        $contact->update([
+            'user_id' => $request->user_id,
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'telephone' => $request->telephone,
+            'email' => $request->email,
+        ]);
+    
+        \Log::info('Contact updated:', ['contact' => $contact]);
+    
+        // Répondre avec succès
+        return response()->json([
+            'status' => 200,
+            'message' => 'Contact mis à jour avec succès !',
+            'results' => $contact,
+        ]);
     }
-
+    
     public function destroy($id)
     {
-        $contact = auth()->user()->contacts()->findOrFail($id);
+        // Trouver le contact par ID
+        $contact = Contact::find($id);
+    
+        if (!$contact) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Contact non trouvé.',
+            ], 404);
+        }
+    
+        // Supprimer le contact
         $contact->delete();
-
-        return response()->json(['message' => 'Contact supprimé avec succès.']);
+    
+        \Log::info('Contact deleted:', ['contact_id' => $id]);
+    
+        // Répondre avec succès
+        return response()->json([
+            'status' => 200,
+            'message' => 'Contact supprimé avec succès !',
+        ]);
     }
-}
+    
+    
+    
+        public function sendEmail($id, Request $request)
+        {
+            // Find the contact by ID
+            $contact = Contact::find($id);
+    
+            if (!$contact) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Contact non trouvé.',
+                ], 404);
+            }
+    
+            // Validate the request data for the email
+            $validated = $request->validate([
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string',
+            ]);
+    
+            // Send the email
+            try {
+                Mail::to($contact->email)->send(new ContactEmail($validated['subject'], $validated['message']));
+                
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Email envoyé avec succès !',
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 500,
+                    'message' => 'Erreur lors de l\'envoi de l\'email.',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        }
+    }
+    
