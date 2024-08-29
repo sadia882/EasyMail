@@ -71,6 +71,8 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\EmailesController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ProgrammingMailController;
+
 
 
 Route::get('/email', [EmailController::class, 'create']);
@@ -86,17 +88,17 @@ Route::get('/test-files', [EmailesController::class, 'testFiles']);
 
 
 
+Route::post('/schedule-email', [ProgrammingMailController::class, 'scheduleEmail']);
+
 
 // Assurez-vous que l'utilisateur est authentifié avant d'accéder aux routes
 
 
 // Route::middleware('auth:sanctum')->group(function () {
     Route::get('/contacts', [ContactController::class, 'index']);
-    Route::post('/contacts', [ContactController::class, 'store']);
     Route::get('/contacts/{id}', [ContactController::class, 'show']);
     Route::put('/contacts/{id}', [ContactController::class, 'update']);
     Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
-    Route::post('/contacts/{id}/send-email', [ContactController::class, 'sendEmail']);
     Route::get('/onecontact/{userId}', [ContactController::class, 'getContactsByUser']);
 
     

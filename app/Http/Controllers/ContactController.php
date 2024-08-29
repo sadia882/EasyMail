@@ -134,39 +134,46 @@ class ContactController extends Controller
     
     
     
-        public function sendEmail($id, Request $request)
-        {
-            // Find the contact by ID
-            $contact = Contact::find($id);
+    public function sendEmailToUser(Request $request, $userId)
+    {
+        // Valider les données du formulaire d'email
+        $validated = $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string',
+        ]);
     
-            if (!$contact) {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Contact non trouvé.',
-                ], 404);
-            }
+        // Trouver l'utilisateur par ID
+        $user = User::find($userId);
     
-            // Validate the request data for the email
-            $validated = $request->validate([
-                'subject' => 'required|string|max:255',
-                'message' => 'required|string',
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Utilisateur non trouvé.',
+            ], 404);
+        }
+    
+        // Vérifier que l'utilisateur a une adresse email valide
+        if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Adresse email invalide.',
+            ], 400);
+        }
+    
+        // Envoyer l'email
+        try {
+            Mail::to($user->email)->send(new ContactEmail($validated['subject'], $validated['message']));
+    
+            return response()->json([
+                'status' => 200,
+                'message' => 'Email envoyé avec succès à ' . $user->email,
             ]);
-    
-            // Send the email
-            try {
-                Mail::to($contact->email)->send(new ContactEmail($validated['subject'], $validated['message']));
-                
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Email envoyé avec succès !',
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => 500,
-                    'message' => 'Erreur lors de l\'envoi de l\'email.',
-                    'error' => $e->getMessage(),
-                ], 500);
-            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Erreur lors de l\'envoi de l\'email.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
-    
+}
