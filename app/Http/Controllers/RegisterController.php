@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Contact;
 
 class RegisterController extends Controller
 {
@@ -18,17 +19,21 @@ class RegisterController extends Controller
                 'telephone' => 'required|string|max:15',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
-            ]);
+            ]); 
 
             // Création de l'utilisateur
             $user = User::create([
                 'nom' => $request->nom,
                 'prenom' => $request->prenom,
-                'telephone' => $request->telephone,
                 'email' => $request->email,
                 'role' => 'client',
                 'password' => Hash::make($request->password),
             ]);
+
+            $contact = Contact::create([
+                'user_id' => $user->id,
+                'telephone' => $request->telephone
+             ]);
 
             return response()->json([
                 'status' => 200,
@@ -36,7 +41,7 @@ class RegisterController extends Controller
                 'results' => [
                     'nom' => $user->nom,
                     'prenom' => $user->prenom,
-                    'telephone' => $user->telephone,
+                    'telephone' => $contact->telephone,
                     'email' => $user->email,
                 ],
             ]);
@@ -74,7 +79,6 @@ class RegisterController extends Controller
         }
     }
 
-    // Nouvelle méthode pour récupérer tous les utilisateurs
     public function index()
     {
         try {

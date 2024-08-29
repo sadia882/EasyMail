@@ -116,6 +116,8 @@ Route::get('/test-files', [EmailesController::class, 'testFiles']);
 
 // Route pour enregistrer un nouvel utilisateur
 Route::post('/register', [RegisterController::class, 'registre']);
+Route::put('/users/{id}', [ContactController::class, 'update']);
+
 
 // Route pour récupérer les données d'un utilisateur par ID
 Route::get('/users/{id}', [RegisterController::class, 'show']);

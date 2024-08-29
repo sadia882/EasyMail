@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Mail;
 
 use App\Mail\ContactEmail; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Contact;
 use App\Models\User;
 
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
 {
+
     public function index()
     {
         // Récupérer tous les contacts
@@ -24,6 +26,8 @@ class ContactController extends Controller
             'results' => $contacts,
         ]);
     }
+
+
     public function getContactsByUser($userId)
 {
     // Vérifier si l'utilisateur existe
@@ -45,77 +49,65 @@ class ContactController extends Controller
         'results' => $contacts,
     ]);
 }
-// Création de contact à partir de l'id du user dans la table users
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'telephone' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255|unique:contacts',
-            'user_id' => 'required|integer',  
-        ]);
-    
-        $userId = $request->user_id;
-    
-        $contact = Contact::create([
-            'user_id' => $userId,
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'telephone' => $request->telephone,
-            'email' => $request->email,
-        ]);
-    
-        \Log::info('Contact created:', ['contact' => $contact]);
-    
-        return response()->json([
-            'status' => 201,
-            'message' => 'Contact créé avec succès !',
-            'results' => $contact,
-        ]);
-    }
-        
-
+// Pour Mettre à jour
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
             'telephone' => 'required|string|max:15',
-            'email' => 'required|string|email|max:255|unique:contacts,email,' . $id,
-            'user_id' => 'required|integer',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8',
         ]);
     
-        // Trouver le contact par ID
-        $contact = Contact::find($id);
     
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Utilisateur non trouvé.',
+            ], 404);
+        }
+
+        // Mettre à jour les informations de l'utilisateur
+        $user->update([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'role' => $user->role, // Garder le rôle existant
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+        ]);
+
+        // Trouver le contact associé
+        $contact = Contact::where('user_id', $user->id)->first();
+
         if (!$contact) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Contact non trouvé.',
             ], 404);
         }
-    
+
         // Mettre à jour les informations du contact
         $contact->update([
-            'user_id' => $request->user_id,
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
             'telephone' => $request->telephone,
-            'email' => $request->email,
         ]);
-    
-        \Log::info('Contact updated:', ['contact' => $contact]);
-    
-        // Répondre avec succès
+
         return response()->json([
             'status' => 200,
-            'message' => 'Contact mis à jour avec succès !',
-            'results' => $contact,
+            'message' => 'Informations mises à jour avec succès !',
+            'results' => [
+                'nom' => $user->nom,
+                'prenom' => $user->prenom,
+                'telephone' => $contact->telephone,
+                'email' => $user->email,
+            ],
         ]);
     }
     
+        
     public function destroy($id)
     {
         // Trouver le contact par ID
